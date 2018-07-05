@@ -67,18 +67,21 @@ function deleteReply(replynum, boardnum) {
 			<th>글내용</th>
 			<td><pre>${board.content}</pre></td>
 		</tr>
-		<c:if test="${not empty board.originalfile}">
-			<tr>
-				<th>첨부파일</th>
-				<td>
+		<tr>
+			<th>첨부파일</th>
+			<td>
+				<c:if test="${not empty board.originalfile}">
 					<a href="download?boardnum=${board.boardnum}">${board.originalfile}</a><br />
-					<!-- 섬네일 -->
-					<c:if test="${not empty type}">
-						<img style="width:100px; height:100px" src="download?boardnum=${board.boardnum}" />
-					</c:if>
-				</td>
-			</tr>
-		</c:if>
+				</c:if>
+				<c:if test="${empty board.originalfile}">
+					 : 첨부된 파일이 없습니다.
+				</c:if>
+				<!-- 섬네일 -->
+				<c:if test="${not empty type}">
+					<img style="width:100px; height:100px" src="download?boardnum=${board.boardnum}" />
+				</c:if>
+			</td>
+		</tr>
 	</table>
 
 	<div id="navigator">

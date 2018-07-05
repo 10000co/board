@@ -130,6 +130,10 @@
 		set 
 			title = #{title}, 
 			content = #{content}, 
+			<if test="originalfile != null and savedfile != null">
+			originalfile = #{originalfile}, 
+			savedfile = #{savedfile}, 
+			</if>
 			regdate = sysdate 
 		where 
 			boardnum = #{boardnum} 

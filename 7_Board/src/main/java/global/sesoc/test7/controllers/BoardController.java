@@ -101,6 +101,7 @@ public class BoardController {
 		try {
 			
 			if(fullPath != null) {
+				// mime 타입(파일타입) 가져오기
 				type = Files.probeContentType(Paths.get(fullPath));
 			}
 			
@@ -122,6 +123,15 @@ public class BoardController {
 	
 	@RequestMapping(value="/deleteboard", method=RequestMethod.GET)
 	public String boardDelete(int boardnum) {
+		Board board = repository.selectOne(boardnum);
+		String savedfile = board.getSavedfile();
+		
+		String fullPath = uploadPath + "/" + savedfile;
+		
+		// 파일 삭제 처리
+		boolean result = FileService.deleteFile(fullPath);
+		System.out.println(result == true ? "처리완료" : "처리실패");
+		
 		repository.delete(boardnum);
 		
 		return "redirect:listboard";
@@ -137,8 +147,34 @@ public class BoardController {
 	}
 	
 	@RequestMapping(value="/updateboard", method=RequestMethod.POST)
-	public String boardUpdate(Board board) {
-		repository.update(board);
+	public String boardUpdate(Board board, MultipartFile upload) {
+		int boardnum = board.getBoardnum();
+		
+		Board old = repository.selectOne(boardnum);
+		
+		// 첨부한 경우
+		if(upload.getSize() != 0 && upload != null) {
+			// 기존 파일 삭제
+			String fullPath = uploadPath + "/" + board.getSavedfile();
+			boolean result = FileService.deleteFile(fullPath);
+			System.out.println(result == true ? "기존파일삭제성공" : "기존파일삭제실패");
+			
+			// 파일 업로드
+			String originalfile = upload.getOriginalFilename();
+			String savedfile = FileService.saveFile(upload, uploadPath);
+			
+			board.setOriginalfile(originalfile);
+			board.setSavedfile(savedfile);
+			
+			repository.update(board);
+		}
+		// 첨부하지 않은 경우
+		else {
+			// 타이틀과 내용만 새로운 내용으로 적용
+			old.setTitle(board.getTitle());
+			old.setContent(board.getContent());
+			repository.update(old);
+		}
 		
 		return "redirect:listboard";
 	}

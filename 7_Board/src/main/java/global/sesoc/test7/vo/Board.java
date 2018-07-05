@@ -2,7 +2,7 @@ package global.sesoc.test7.vo;
 
 public class Board {
 	
-	private String boardnum;
+	private int boardnum;
 	private String userid;
 	private String title;
 	private String content;
@@ -13,7 +13,7 @@ public class Board {
 	
 	public Board() { }
 
-	public Board(String boardnum, String userid, String title, String content, int hitcount, String regdate,
+	public Board(int boardnum, String userid, String title, String content, int hitcount, String regdate,
 			String originalfile, String savedfile) {
 		super();
 		this.boardnum = boardnum;
@@ -26,7 +26,7 @@ public class Board {
 		this.savedfile = savedfile;
 	}
 
-	public String getBoardnum() {
+	public int getBoardnum() {
 		return boardnum;
 	}
 
@@ -58,7 +58,7 @@ public class Board {
 		return savedfile;
 	}
 
-	public void setBoardnum(String boardnum) {
+	public void setBoardnum(int boardnum) {
 		this.boardnum = boardnum;
 	}
 
