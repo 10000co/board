@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="global.sesoc.test7.dao.BoardMapper">
+	<!-- 게시글 전체 조회 ver3 -->
+	<select id="select" resultType="Board" parameterType="map">
+		select 
+			boardnum,
+			userid,
+			title,
+			content,
+			to_char(regdate, 'YYYY-MM-DD') regdate,
+			hitcount,
+			originalfile,
+			savedfile 
+		from 
+			board2 
+		where 
+			${searchItem} 
+		like 
+			'%' || #{searchWord} || '%' 
+		order by 
+			boardnum desc 
+	</select>
+
+	<!-- 게시글 전체 조회 ver2 -->
+	<select id="select2" resultType="Board" parameterType="map">
+		select * from 
+		(
+		  select rownum num, b2.* from
+		  (
+		    select 
+		      boardnum,
+		      userid,
+		      title,
+		      content,
+		      to_char(regdate, 'YYYY-MM-DD') regdate,
+		      hitcount,
+		      originalfile,
+		      savedfile 
+		    from 
+		      board2
+		    where 
+		      ${searchItem} like '%' || #{searchWord} || '%' 
+		    order by boardnum desc
+		  ) b2
+		) where num &gt;= #{srow} and num &lt;= #{erow}
+	</select>
+	
+	<!-- 게시글 전체 조회 ver1 -->
+	<select id="select1" resultType="Board" parameterType="map">
+		select 
+			boardnum,
+			userid,
+			title,
+			content,
+			to_char(regdate, 'YYYY-MM-DD') regdate,
+			hitcount,
+			originalfile,
+			savedfile 
+		from 
+			board2 
+		where 
+			<choose>
+				<when test="searchItem == 'userid'">userid</when>
+				<when test="searchItem == 'title'">title</when>
+				<when test="searchItem == 'content'">content</when>
+			</choose> 
+		like 
+			'%' || #{searchWord} || '%' 
+		order by 
+			boardnum desc 
+	</select>
+	
+	<!-- 게시글 1개 조회 -->
+	<select id="selectOne" parameterType="int" resultType="Board">
+		select 
+			boardnum,
+			userid,
+			title,
+			content,
+			to_char(regdate, 'YYYY-MM-DD') regdate,
+			hitcount,
+			originalfile,
+			savedfile
+		from 
+			board2 
+		where 
+			boardnum = #{boardnum} 
+	</select>
+	
+	<!-- 글삭제 -->
+	<delete id="delete" parameterType="int">
+		delete from board2 
+		where 
+			boardnum = #{boardnum} 
+	</delete>
+	
+	<!-- 글등록 -->
+	<insert id="insert" parameterType="Board">
+		insert into board2
+		(
+			boardnum, 
+			userid, 
+			title, 
+			content, 
+			<if test="originalfile != null and savedfile != null">
+			originalfile, 
+			savedfile 
+			</if>
+		) 
+		values
+		(
+			board2_seq.nextval,
+			#{userid}, 
+			#{title}, 
+			#{content}, 
+			<if test="originalfile != null and savedfile != null">
+			#{originalfile}, 
+			#{savedfile} 
+			</if>
+		)
+	</insert>
+	
+	<!-- 글수정 -->
+	<update id="update" parameterType="Board">
+		update board2 
+		set 
+			title = #{title}, 
+			content = #{content}, 
+			regdate = sysdate 
+		where 
+			boardnum = #{boardnum} 
+	</update>
+	
+	<!-- 조회수 증가 -->
+	<update id="updateHitcount" parameterType="int">
+		update board2 
+		set 
+			hitcount = hitcount + 1 
+		where 
+			boardnum = #{boardnum} 
+	</update>
+	
+	<!-- 총 글 개수 조회(페이징) -->
+	<select id="getTotalBoard" parameterType="map" resultType="int">
+		select 
+			count(*) 
+		from 
+			board2 
+		where  
+			<choose>
+				<when test="searchItem == 'userid'">userid</when>
+				<when test="searchItem == 'title'">title</when>
+				<when test="searchItem == 'content'">content</when>
+			</choose> 
+		like 
+			'%' || #{searchWord} || '%' 
+	</select>
+
+</mapper>

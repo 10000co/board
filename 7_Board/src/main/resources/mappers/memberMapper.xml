@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="global.sesoc.test7.dao.MemberMapper">
+	<!-- 회원가입 -->
+	<insert id="insert" parameterType="Member">
+		insert into 
+			members2 
+		values(
+			#{userid}, 
+			#{userpwd}, 
+			#{username},
+			#{gender}, 
+			#{hobby}, 
+			#{birth}, 
+			#{age}, 
+			#{phone}, 
+			#{address}, 
+			#{introduce}
+		)
+	</insert>
+	
+	<!-- 회원정보수정 -->
+	<update id="update" parameterType="Member">
+		update 
+			members2 
+		set 
+			userpwd = #{userpwd},
+			hobby = #{hobby}, 
+			phone = #{phone}, 
+			address = #{address}, 
+			introduce = #{introduce}
+		where 
+			userid = #{userid} 
+	</update>
+
+	<!-- 로그인, 아이디 중복확인 -->
+	<select id="selectOne" parameterType="Member" resultType="Member">
+		select 
+			*  
+		from 
+			members2 
+		where 
+			userid = #{userid} 
+			<if test="userpwd != null">
+			and
+				userpwd = #{userpwd}
+			</if> 
+	</select>
+
+</mapper>
