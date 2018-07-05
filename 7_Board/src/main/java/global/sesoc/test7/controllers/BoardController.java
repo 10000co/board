@@ -1,12 +1,21 @@
 package global.sesoc.test7.controllers;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -82,6 +91,30 @@ public class BoardController {
 		
 		Board board = repository.selectOne(boardnum);
 		
+		String fullPath = null;
+		String type = null;
+		
+		if(board.getSavedfile() != null) {
+			fullPath = uploadPath + "/" + board.getSavedfile();
+		}
+		
+		try {
+			
+			if(fullPath != null) {
+				type = Files.probeContentType(Paths.get(fullPath));
+			}
+			
+			System.out.println(type);
+			
+			if(type != null && type.contains("image")) {
+				model.addAttribute("type", type);
+			}
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		model.addAttribute("board", board);
 		
 		return "board/boardDetail";
@@ -108,5 +141,44 @@ public class BoardController {
 		repository.update(board);
 		
 		return "redirect:listboard";
+	}
+	
+	@RequestMapping(value="/download", method=RequestMethod.GET)
+	public String download(int boardnum, HttpServletResponse response) {
+		Board board = repository.selectOne(boardnum);
+		
+		String savedfile = board.getSavedfile();
+		String originalfile = board.getOriginalfile();
+		
+		String fullPath = uploadPath + "/" + savedfile;
+		
+		FileInputStream fin = null;
+		ServletOutputStream fout = null;
+		
+		try {
+			fin = new FileInputStream(fullPath);
+			fout = response.getOutputStream();
+			
+			// 브라우저가 자동으로 파일을 열지 않도록 지정( Content-Disposition )
+			response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(originalfile, "UTF-8"));
+			FileCopyUtils.copy(fin, fout);
+			
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			try {
+				if(fin != null) fin.close();
+				if(fout != null) fout.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		return null;
 	}
 }

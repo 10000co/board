@@ -54,8 +54,11 @@
 					<td class="center">${status.count + navi.startRecord}</td>
 					<td class="title">
 						<a href="javascript:read('${board.boardnum}')">
-						${board.title}
+							${board.title}
 						</a>
+						<c:if test="${not empty board.originalfile}">
+							<img src="img/attachment.png" />
+						</c:if>
 					</td>
 					<td>${board.userid}</td>
 					<td class="center">${board.hitcount}</td>
