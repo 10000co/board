@@ -51,7 +51,12 @@ function boardList() {
 				<th>첨부파일</th>
 				<td>
 					<input type="file" name="upload" /><br/>
-					${board.originalfile}
+					<c:if test="${not empty board.originalfile}">
+						${board.originalfile}
+						<a href="deletefile?boardnum=${board.boardnum}">
+							<img src="img/remove.png" />
+						</a>
+					</c:if>
 				</td>
 			</tr>
 			<tr>

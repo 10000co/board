@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import global.sesoc.test7.dao.BoardRepository;
 import global.sesoc.test7.util.FileService;
@@ -217,4 +218,31 @@ public class BoardController {
 		
 		return null;
 	}
+	
+	@RequestMapping(value="/deletefile", method=RequestMethod.GET)
+	public String filedelete(int boardnum, RedirectAttributes rttr) {		
+		// 파일 정보 가져오기
+		Board board = repository.selectOne(boardnum);
+		
+		// 삭제할 실제 파일명 가져오기
+		String savedfile = board.getSavedfile();
+		
+		// 파일경로
+		String fullPath = uploadPath + "/" + savedfile;		
+		
+		// 삭제후 수정된 부분을 반영하는 부분
+		board.setOriginalfile(null);
+		board.setSavedfile(null);
+		repository.update(board);
+		
+		// 파일삭제
+		boolean result = FileService.deleteFile(fullPath);
+		System.out.println(result == true ? "추가된 파일 삭제 성공" : "추가된 파일 삭제 실패");
+		
+		// 수정된 내용을 반영하여 업데이트 보드로 리다이렉트
+		rttr.addAttribute("boardnum", boardnum);
+		
+		return "redirect:updateboard";
+	}
 }
+
