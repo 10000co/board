@@ -23,15 +23,21 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import global.sesoc.test7.dao.BoardRepository;
+import global.sesoc.test7.dao.ReplyRepository;
 import global.sesoc.test7.util.FileService;
 import global.sesoc.test7.util.PageNavigator;
 import global.sesoc.test7.vo.Board;
+import global.sesoc.test7.vo.Reply;
+import jdk.nashorn.internal.ir.RuntimeNode.Request;
 
 @Controller
 public class BoardController {
 	
 	@Autowired
 	BoardRepository repository;
+	
+	@Autowired
+	ReplyRepository repository_reply;
 	
 	// 파일 업로드 경로
 	final String uploadPath = "/boardfile";
@@ -47,7 +53,7 @@ public class BoardController {
 		
 		int totalRecordCount = repository.getTotalBoard(searchItem, searchWord);		
 		PageNavigator navi = new PageNavigator(currentPage, totalRecordCount);		
-		List<Board> list = repository.select(searchItem, searchWord, navi.getStartRecord(), navi.getCountPerPage());		
+		List<Board> list = repository.select(searchItem, searchWord, navi.getStartRecord(), navi.getCountPerPage());
 		
 		model.addAttribute("list", list);
 		model.addAttribute("searchItem", searchItem);
@@ -91,6 +97,7 @@ public class BoardController {
 		repository.updateHitcount(boardnum);
 		
 		Board board = repository.selectOne(boardnum);
+		List<Reply> replyList = repository_reply.replySelect(boardnum);
 		
 		String fullPath = null;
 		String type = null;
@@ -118,6 +125,7 @@ public class BoardController {
 		}
 		
 		model.addAttribute("board", board);
+		model.addAttribute("replyList", replyList);
 		
 		return "board/boardDetail";
 	}
@@ -243,6 +251,46 @@ public class BoardController {
 		rttr.addAttribute("boardnum", boardnum);
 		
 		return "redirect:updateboard";
+	}
+	
+	/**
+	 * Reply 
+	 */
+	
+	// 댓글 입력
+	@RequestMapping(value="/replyWrite", method=RequestMethod.POST)
+	public String replyWrite(Reply reply, HttpSession session, RedirectAttributes rttr) {
+		String userid = (String)session.getAttribute("loginId");
+		reply.setUserid(userid);
+		
+		repository_reply.replyInsert(reply);		
+		rttr.addAttribute("boardnum", reply.getBoardnum());
+		
+		return "redirect:detailboard";
+	}
+	
+	// 댓글 삭제
+	@RequestMapping(value="/replyDelete", method=RequestMethod.GET)
+	public String replyDelete(Reply reply, HttpSession session, RedirectAttributes rttr) {
+		String userid = (String)session.getAttribute("loginId");
+		reply.setUserid(userid);
+		
+		repository_reply.replyDelete(reply.getReplynum());
+		rttr.addAttribute("boardnum", reply.getBoardnum());
+		
+		return "redirect:detailboard";
+	}
+	
+	// 댓글 수정
+	@RequestMapping(value="/replyUpdate", method=RequestMethod.GET)
+	public String replyUpdate(Reply reply, HttpSession session, RedirectAttributes rttr) {
+		String userid = (String)session.getAttribute("loginId");
+		reply.setUserid(userid);
+		
+		repository_reply.replyUpdate(reply);
+		rttr.addAttribute("boardnum", reply.getBoardnum());
+		
+		return "redirect:detailboard";
 	}
 }
 

@@ -10,6 +10,9 @@
 </head>
 <body>
 <h2>[ 회원 게시판 ]</h2>
+
+	<img src="img/coffee.png" width="100" height="100">
+
 	<ul>
 		<c:if test="${sessionScope.loginId == null}">
 			<li><a href="join">회원가입</a></li>
@@ -24,6 +27,6 @@
 		
 		<li><a href="listboard">게시판</a></li>
 	</ul>
-	<img src="img/coffee.png" width="100" height="100">
+	
 </body>
 </html>

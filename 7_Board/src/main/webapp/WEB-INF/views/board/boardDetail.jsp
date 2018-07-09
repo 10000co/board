@@ -6,41 +6,109 @@
 <head>
 <meta charset="UTF-8">
 <title>글읽기</title>
+<style type="text/css">
+	div#wrapper{
+		width : 800px;
+		margin : 0 auto;
+	}
+	div#wrapper>h2 {
+		text-align : center;
+	}
+	div#wrapper table {
+		margin:0 auto;
+		width : 800px;
+	}
+	th {
+		width: 100px;
+	}
+	pre {
+		width : 600px;
+		height : 200px;
+		overflow: auto;
+	}
+	table.reply {
+		width : 800px;
+	}
+	input[name='text'] {
+		width : 600px;
+	}
+	span {
+		display: inline-block;
+
+		margin : 5px;
+	}
+	td.replycontent {
+		width : auto;
+	}
+	td.replytext {
+		width : 600px;
+		text-align : left;
+	}
+	td.replysub {
+		width : 80px;
+		text-align : right;
+	}
+	td.replybtn{
+		width : 100px;
+		text-align : right;
+	}
+</style>
 <script type="text/javascript">
-//글 삭제를 위한 함수-1
-function boardDelete(boardnum) {
-	if (confirm('정말 삭제하시겠습니까?')) {
-		location.href = "deleteboard?boardnum=" + boardnum;
-	}
-}
 
-//글 수정
-function boardUpdate(boardnum) {
-	location.href = "updateboard?boardnum=" + boardnum;
-}
-	
-//댓글 달기
-function replyCheck() {
-	var replytext = document.getElementById("replytext");
-	
-	if(replytext.value == '') {
-		alert("댓글을 입력하세요");
-		return false;
+	function replydelete(replynum) {
+		var answer = confirm("댓글을 삭제하시겠습니까?");
+		if(answer) {
+			location.href="replyDelete?replynum="+replynum+"&boardnum="+"${board.boardnum}";
+		}
+		return;
 	}
-	return true;
-}
-
-// 댓글 삭제
-function deleteReply(replynum, boardnum) {
-	alert("댓글 삭제");
-	if (confirm('정말 삭제하시겠습니까?')) {
-		location.href = "board?action=deleteReplay&replynum=" + replynum + "&boardnum=" + boardnum;
+	function replymodify(replynum, text) {
+		document.getElementById("reply_txt").value = text;
+		document.getElementById("reply_submit").value = "댓글 수정";
+		
+		document.getElementById("reply_submit").onclick = function() {
+			if(document.getElementById("reply_submit").value == "댓글 수정") {
+				var updatetext = document.getElementById("reply_txt").value;
+				location.href="replyUpdate?replynum="+replynum+"&boardnum="+"${board.boardnum}&replytext="+updatetext;
+			}
+		}
+	
+		return false; //submit 기본액션이 없음
 	}
-}
+	
+	function replywrite() {
+		var writetext = document.getElementById("reply_txt").value;
+		
+		if(writetext.length == 0) {
+			alert("댓글을 입력하세요");
+			return;
+		}
+		
+		document.getElementById("replyWrite").submit();
+		
+	}
+	
+	function boardUpdate() {
+		location.href="updateboard?boardnum="+${board.boardnum};
+	}
+	
+	function boardDelete() {
+		var answer = confirm("게시글을 삭제하시겠습니까?")	;
+		if(answer) {
+			location.href="deleteboard?boardnum="+${board.boardnum};
+		}
+	}
+	
+	function boardList() {
+		var targetPlace = "listboard?currentPage=${navi.currentPage}&searchItem=${searchItem}&searchWord=${searchWord}";
+		location.href=targetPlace;
+	}
+	
 </script>
 </head>
 <body>
 <div id="wrapper">
+
 	<h2>[ 게시판 글 읽기 ]</h2>
 	<table class="board">
 		<tr>
@@ -86,44 +154,54 @@ function deleteReply(replynum, boardnum) {
 
 	<div id="navigator">
 		<a href="listboard">목록</a>
-<%-- 		<c:if test="${sessionScope.loginId eq board.userid }"> --%>
+		<c:if test="${sessionScope.loginId eq board.userid }">
 			<a href="javascript:boardUpdate('${board.boardnum}')">수정</a> 
 			<a href="javascript:boardDelete('${board.boardnum}')">글삭제</a>
 			<br/>
-			<%-- <a id="del" data-item="${board.boardnum }" href="javascript:void(0);">삭제</a> --%>
-<%-- 		</c:if> --%>
+			<a id="del" data-item="${board.boardnum }" href="javascript:void(0);">삭제</a>
+		</c:if>
 	</div>
 	
-	<!-- 댓글 폼 영역 -->
-	<div id="replyForm">
-	<c:if test="${not empty loginId}">
-		<div id="replyForm">
-		<form action="board" method="post" onsubmit="return replyCheck()" >
-			<input type="hidden" name="action" value="insertReply" />
-			<input type="hidden" name="boardnum" value="${board.boardnum}" />
-			<input type="text" id="replytext" name="replytext" style="width:500px">
-			<input type="submit" value="댓글달기">
-		</form>
-		</div>
-	</c:if>
+	<br />
+	<!-- 댓글 입력 -->
+	<form id="replyWrite" action="replyWrite" method="POST">
+	<input type="hidden" name="boardnum" value="${board.boardnum }" />
+	<table id="replyinput" class="reply">
+		<tr>
+			<td>
+			<input id="reply_txt" name="replytext" type="text" name="text" />
+			<input id="reply_submit" type="button" value="댓글 입력" onclick="replywrite()" />
+			</td>
+		</tr>
+	</table>
+	</form>
 	
-	<!-- 댓글 목록 영역 -->
-	<table class="replyList">
+	<!-- 댓글 출력 -->
+	<div id="replydisplay">
+	<table class="reply">
 		<c:forEach var="reply" items="${replyList}">
 		<tr>
-			<td class="replyid">${reply.userid}</td>
-			<td class="replytext">${reply.replytext}</td>
-			<td class="replydate">${reply.regdate}</td>
-			<td class="replybutton">
-				<c:if test="${loginId == reply.userid}">
-				<a href="javascript:update('${board.boardnum}')">수정</a>
-				<a href="javascript:deleteReply(${reply.replynum}, ${reply.boardnum})">삭제</a>
-				</c:if>
+			<td class="replytext">
+				${reply.replytext}
 			</td>
+			<td class="sub replyid">
+				<span>${reply.userid} </span>
+			</td>
+			<td class="sub replydate">
+				<span>${reply.regdate}</span>
+			</td>
+			<c:if test="${loginId == reply.userid }">
+			<td class="replybtn">
+				<input type="button" value="삭제" onclick="replydelete('${reply.replynum}')"/>
+				<input type="button" value="수정" onclick="replymodify('${reply.replynum}', '${reply.replytext}')"/>
+			</td>
+			</c:if>
 		</tr>
 		</c:forEach>
 	</table>
-	</div> <!--  end #reply -->
-</div> <!-- end #wrapper -->
+	</div> <!-- end #replydisplay -->
+	
+</div>
+	
 </body>
 </html>
