@@ -77,7 +77,7 @@ function deleteReply(replynum, boardnum) {
 					 : 첨부된 파일이 없습니다.
 				</c:if>
 				<!-- 섬네일 -->
-				<c:if test="${not empty type}">
+				<c:if test="${not empty type and sessionScope.loginId eq board.userid}">
 					<img style="width:100px; height:100px" src="download?boardnum=${board.boardnum}" />
 				</c:if>
 			</td>
