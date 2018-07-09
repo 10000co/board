@@ -1,0 +1,47 @@
+@charset "UTF-8";
+
+div#wrapper{
+	width : 800px;
+	margin : 0 auto;
+}
+div#wrapper>h2 {
+	text-align : center;
+}
+div#wrapper table {
+	margin:0 auto;
+	width : 800px;
+}
+th {
+	width: 100px;
+}
+pre {
+	width : 600px;
+	height : 200px;
+	overflow: auto;
+}
+table.reply {
+	width : 800px;
+}
+input[name='text'] {
+	width : 600px;
+}
+span {
+	display: inline-block;
+
+	margin : 5px;
+}
+td.replycontent {
+	width : auto;
+}
+td.replytext {
+	width : 600px;
+	text-align : left;
+}
+td.replysub {
+	width : 80px;
+	text-align : right;
+}
+td.replybtn{
+	width : 100px;
+	text-align : right;
+}

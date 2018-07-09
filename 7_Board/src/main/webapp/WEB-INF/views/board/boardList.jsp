@@ -7,7 +7,7 @@
 <head>
 <meta charset="UTF-8">
 <title>게시판</title>
-<link href="css/board/board.css" rel="stylesheet" />
+<link href="css/board/boardList.css" rel="stylesheet" />
 <script type="text/javascript">
 	function read(boardnum) {
 		location.href = "detailboard?boardnum=" + parseInt(boardnum);

@@ -18,9 +18,6 @@ function formCheck() {
 	}
 	return true;
 }
-function boardList() {
-	location.href = "";
-}
 </script>
 </head>
 <body>
@@ -50,7 +47,7 @@ function boardList() {
 			</tr>
 			<tr>
 				<td class="btn" colspan="2" >
-					<input type="button" value="목록" onclick="boardList()" />
+					<input type="button" value="목록" onclick="location.href='${pageContext.request.contextPath}'" />
 					<input type="submit" value="저장">
 				</td>
 			</tr>
