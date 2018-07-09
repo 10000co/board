@@ -69,11 +69,11 @@
 	</table>
 	
 	<!-- 로그인 하지 않으면 글쓰기를 할 수 없음 -->
-	<c:if test="${not empty sessionScope.loginId}">
+<%-- 	<c:if test="${not empty sessionScope.loginId}"> --%>
 		<div class="right">
 			<a href="writeboard">글쓰기</a>
 		</div>
-	</c:if>
+<%-- 	</c:if> --%>
 	
 	<div class="boardfooter">
 		<a href="listboard?currentPage=${navi.currentPage - navi.pagePerGroup}&searchItem=${searchItem}&searchWord=${searchWord}">◁◁</a>

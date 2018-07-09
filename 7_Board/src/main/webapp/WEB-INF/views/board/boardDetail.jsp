@@ -86,12 +86,12 @@ function deleteReply(replynum, boardnum) {
 
 	<div id="navigator">
 		<a href="listboard">목록</a>
-		<c:if test="${sessionScope.loginId eq board.userid }">
+<%-- 		<c:if test="${sessionScope.loginId eq board.userid }"> --%>
 			<a href="javascript:boardUpdate('${board.boardnum}')">수정</a> 
 			<a href="javascript:boardDelete('${board.boardnum}')">글삭제</a>
 			<br/>
 			<%-- <a id="del" data-item="${board.boardnum }" href="javascript:void(0);">삭제</a> --%>
-		</c:if>
+<%-- 		</c:if> --%>
 	</div>
 	
 	<!-- 댓글 폼 영역 -->
